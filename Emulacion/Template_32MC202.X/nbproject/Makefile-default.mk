@@ -95,14 +95,14 @@ endif
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: assemble
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/BLINK33MC202.o: BLINK33MC202.s  .generated_files/flags/default/c57c868d95fa0b00e2ff7ae2345bc458d69f45b6 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/BLINK33MC202.o: BLINK33MC202.s  .generated_files/flags/default/6016f5506e4586d92b68b35d0f06877fc5f4ad05 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/BLINK33MC202.o.d 
 	@${RM} ${OBJECTDIR}/BLINK33MC202.o 
 	${MP_CC} $(MP_EXTRA_AS_PRE)  BLINK33MC202.s  -o ${OBJECTDIR}/BLINK33MC202.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -omf=elf -DXPRJ_default=$(CND_CONF)    -Wa,-MD,"${OBJECTDIR}/BLINK33MC202.o.d",--defsym=__MPLAB_BUILD=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_SIMULATOR=1,-g,--no-relax$(MP_EXTRA_AS_POST)  -mdfp="${DFP_DIR}/xc16"
 	
 else
-${OBJECTDIR}/BLINK33MC202.o: BLINK33MC202.s  .generated_files/flags/default/7abbdeb10a1038159196b52619fec12d17d9171c .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/BLINK33MC202.o: BLINK33MC202.s  .generated_files/flags/default/dfb3ecbd3d30bb63750be4be1f75e5868ef71d1f .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/BLINK33MC202.o.d 
 	@${RM} ${OBJECTDIR}/BLINK33MC202.o 
@@ -147,7 +147,7 @@ endif
 # Enable dependency checking
 .dep.inc: .depcheck-impl
 
-DEPFILES=$(shell mplabwildcard ${POSSIBLE_DEPFILES})
+DEPFILES=$(wildcard ${POSSIBLE_DEPFILES})
 ifneq (${DEPFILES},)
 include ${DEPFILES}
 endif

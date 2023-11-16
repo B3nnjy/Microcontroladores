@@ -179,8 +179,7 @@ CYCLE1:
     POP	    W9
     POP	    W0
     RETURN    
-
-
+    
 
 ;..............................................................................
 ;Subroutine: Initialization of W registers to 0x0000

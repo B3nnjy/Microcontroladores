@@ -115,13 +115,14 @@ __reset:
     SETM    AD1PCFGL  ;PORTB AS DIGITAL
     CLR	    TRISB
     MOV	    #250,   W9	    ;PARAMETER FOR DELAY_ms(w9)
-
+    MOV #0x0002, W1
+    MOV W1, PORTB
 
 done:
-    
-    COM	PORTB
-    CALL DELAY_1ms
-    
+    CALL DELAY_1s
+    COM W1, W1
+    AND #0x0003, W1
+    MOV W1, PORTB
 BRA     done              ;Place holder for last line of executed code
     
     
@@ -135,14 +136,14 @@ BRA     done              ;Place holder for last line of executed code
 ;FOSC = 7.3725 MHz -> this is the internal clock source (FRC) and we are using it. 
     ;If you use another clock source you have to modify "config __FOSC" section 
     
-;FCY = FOSC/4 = 3686250 cycles p/sec.
+;FCY = FOSC/2 = 3686250 cycles p/sec.
 ;T(FCY) = 271.278 ns. This is the time for an internal instruction cycle clock (FCY).	
 
 ;"CYCLE1" will repeat 2^16 times = 65536 times
 ;DEC(1) + BRA(2) = 3 pulses in total
 ;(BRA uses 2 CLK pulses when it jumps and just one if it does not)
 
-;65536 * 3 cycles * 271 ns = 17.77 ms
+;65536 * 3 cycles * 271 ns = 53.28 ms
 ;Thus, "CYCLE1" must be repeated 56 times to delay 1s
 DELAY_1s:
     PUSH	    W0
