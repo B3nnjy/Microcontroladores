@@ -1,6 +1,6 @@
 /*
  * File:   template.s
- * Author: Baltazar Jiménez 
+ *  
  *
  * Created on March 13th, 2023
  */
