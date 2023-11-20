@@ -69,11 +69,11 @@ Default Scalar Model: Small
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x200                0x82            0xc3  (195)
-.text                        0x282                0xa2            0xf3  (243)
-.dinit                       0x324                0x14            0x1e  (30)
-.myconstbuffer               0x338                 0x8             0xc  (12)
+.text                        0x282                0x5c            0x8a  (138)
+.dinit                       0x2de                0x14            0x1e  (30)
+.myconstbuffer               0x2f2                 0x8             0xc  (12)
 
-                 Total "program" memory used (bytes):          0x1e0  (480) <1%
+                 Total "program" memory used (bytes):          0x177  (375) <1%
 
 
 "data" Memory  [Origin = 0x800, Length = 0x4000]
@@ -99,21 +99,19 @@ stack                       0x2880                              0x1f80  (8064)
 
 External Symbols in Program Memory (by address):
 
-                  0x000206                  __data_init
                   0x000206                  __data_init_standard
+                  0x000206                  __data_init
                   0x00027c                  __DefaultInterrupt
                   0x000282                  __reset
-                  0x000310                  ____U1RXInterrupt
-                  0x000318                  _wreg_init
+                  0x0002d2                  _wreg_init
 
 External Symbols in Program Memory (by name):
 
                   0x00027c                  __DefaultInterrupt
-                  0x000310                  ____U1RXInterrupt
                   0x000206                  __data_init
                   0x000206                  __data_init_standard
                   0x000282                  __reset
-                  0x000318                  _wreg_init
+                  0x0002d2                  _wreg_init
 
 Memory Configuration
 
@@ -246,9 +244,9 @@ __FUID3
  *(.debug_abbrev)
  .debug_abbrev    0x000000         0x14 build/default/debug/mainasm33.o
 
-.debug_line       0x000000         0x8b
+.debug_line       0x000000         0x69
  *(.debug_line)
- .debug_line      0x000000         0x8b build/default/debug/mainasm33.o
+ .debug_line      0x000000         0x69 build/default/debug/mainasm33.o
 
 .debug_frame
  *(.debug_frame)
@@ -1375,15 +1373,14 @@ __c30_signature
 .ybss               0x2800         0x80
  .ybss              0x2800         0x80 build/default/debug/mainasm33.o
 
-.text             0x000282         0xa2
- .text            0x000282         0xa2 build/default/debug/mainasm33.o
+.text             0x000282         0x5c
+ .text            0x000282         0x5c build/default/debug/mainasm33.o
                   0x000282                  __reset
-                  0x000310                  ____U1RXInterrupt
-                  0x000318                  _wreg_init
+                  0x0002d2                  _wreg_init
 
-.dinit            0x000324         0x14
- .dinit           0x000324         0x14 data_init
+.dinit            0x0002de         0x14
+ .dinit           0x0002de         0x14 data_init
 
-.myconstbuffer    0x000338          0x8
+.myconstbuffer    0x0002f2          0x8
  .myconstbuffer
-                  0x000338          0x8 build/default/debug/mainasm33.o
+                  0x0002f2          0x8 build/default/debug/mainasm33.o

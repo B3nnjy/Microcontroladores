@@ -1,6 +1,6 @@
 /*
  * File:   template.s
- *  
+ * Author: Baltazar Jiménez 
  *
  * Created on March 13th, 2023
  */
@@ -48,8 +48,6 @@
                                  ;in the C file.
 
     .global __reset          ;The label for the first line of code.
-    
-    .global __U1RXInterrupt	;Interrupcion de recepcion de UART
 
 ;..............................................................................
 ;Constants stored in Program space
@@ -115,30 +113,16 @@ __reset:
 
 
     SETM    AD1PCFGL  ;PORTB AS DIGITAL
-    
-    MOV #0x0000, W1
-    MOV W1, TRISB	;Configurar PORTB como salida
-    
-    ;PORTB15 entrada
-    BSET TRISB, #TRISB15    
-    
-    MOV	    #400,   W9	    ;PARAMETER FOR DELAY_ms(w9)
-    
-    ;Mapeo de puerto RX
-    CALL MAPEAR_PIN_UART_RX
-    
-    ;Configuracion de la interrupcion de UART
-    CALL INTERRUPT_UART_CONF
-    
-    ;Configuracion de UART
-    CALL UART_CONF
-    
-    CALL FILLING_LINE
+    CLR	    TRISB
+    MOV	    #250,   W9	    ;PARAMETER FOR DELAY_ms(w9)
+    MOV #0x0002, W1
+    MOV W1, PORTB
 
 done:
-    MOV W8, PORTB
-    ;MODO INACTIVO
-    PWRSAV #IDLE_MODE	  
+    CALL DELAY_1s
+    COM W1, W1
+    AND #0x0003, W1
+    MOV W1, PORTB
 BRA     done              ;Place holder for last line of executed code
     
     
@@ -193,104 +177,7 @@ CYCLE1:
     
     POP	    W9
     POP	    W0
-    RETURN   
-    
-FILLING_LINE:
-    PUSH W0
-    PUSH W2
-    
-    MOV #7, W2
-    
-    CLR W0
-    CALL DELAY_1s
-    MOV W0, PORTB
-    
-    MOV #1, W0
-    CALL DELAY_1ms
-    MOV W0, PORTB
-    
-    DO W2, B3
-	CALL DELAY_1ms 
-	MUL.UU W0, #2, W0
-	ADD #1, W0
-	MOV W0, PORTB
-    B3: NOP
-    
-    POP W2
-    POP W0
-    RETURN
-    
-    
-MAPEAR_PIN_UART_RX:
-    PUSH W0
-    
-    ;Mapear UART RX al pin RP15
-    MOV #0x000F, W0
-    MOV W0, RPINR18
-    
-    POP W0
-    RETURN
-    
-UART_CONF:
-    PUSH W0
-    
-    CLR U1MODE
-    
-    ;---Configurar cantidad de BAUDIOS---
-    ;FCY = FCY = 3686250Hz = 3686250 ciclo/segundo
-    ;Baudios deseados = 9600
-    ;UxBRG = (Fcy/Baud)/16
-    ;UxBRG = ((3686250/9600)/16)-1 = 22.9990234375 = 23
-    ;Baud rate = 3686250/(16*(UxBRG + 1)) 
-    ;Baud rate = 3686250/(16*(23 + 1)) = 9,599.6093
-    
-    MOV #23, W0
-    MOV W0, U1BRG
-    
-    ;Bits de datos y paridad (8 bits de datos y sin paridad)
-    BCLR U1MODE, #PDSEL0
-    BCLR U1MODE, #PDSEL1
-    
-    ;Numero de bits de parada
-    BCLR U1MODE, #STSEL
-    
-    ;Low speed mode baud rate
-    BCLR U1MODE, #BRGH	
-    
-    ;Habilitar UART
-    BSET U1MODE, #UARTEN	
-    
-    ;La bandera de interrupcion se activa cuando un caracter es recibido
-    BCLR U1STA, #URXISEL1
-    BCLR U1STA, #URXISEL0
-    
-    POP W0
-    
-    RETURN
-    
-INTERRUPT_UART_CONF:
-    ;Interrupciones anidadas deshabilitadas
-    BSET INTCON1, #NSTDIS
-    
-    ;Nivel de prioridad 100
-    BSET IPC2, #U1RXIP2
-    BCLR IPC2, #U1RXIP1
-    BCLR IPC2, #U1RXIP0
-    
-    ;Limpiar la bandera de recepcion
-    BCLR IFS0, #U1RXIF
-    
-    ;Habilitar la bandera de recepcion
-    BSET IEC0, #U1RXIE
-    
-    RETURN
-    
-__U1RXInterrupt:
-    ;Mueve el dato del buffer de recepcion a W8
-    MOV U1RXREG, W8
-    ;Limpiar la bandera de recepcion
-    BCLR IFS0, #U1RXIF
-    RETFIE
+    RETURN    
 
 
 
