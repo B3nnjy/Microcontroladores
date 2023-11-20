@@ -48,6 +48,8 @@
                                  ;in the C file.
 
     .global __reset          ;The label for the first line of code.
+    
+    .global ____U1RXInterrupt	;Interrupcion de recepcion de UART
 
 ;..............................................................................
 ;Constants stored in Program space
@@ -113,16 +115,19 @@ __reset:
 
 
     SETM    AD1PCFGL  ;PORTB AS DIGITAL
-    CLR	    TRISB
+    MOV #0x8000, W0
+    MOV W0, TRISB
     MOV	    #1,   W9	    ;PARAMETER FOR DELAY_ms(w9)
-
+    
+    CALL MAPEAR_PIN_UART_RX
+    ;Configuracion de la interrupcion de UART
+    CALL INTERRUPT_UART_CONF
+    
+    CALL UART_CONF
 
 done:
-    
-    COM	PORTB
-    CALL DELAY_1ms
-    
-    
+    MOV W8, PORTB
+    CALL DELAY_1s
     
 BRA     done              ;Place holder for last line of executed code
     
@@ -180,7 +185,83 @@ CYCLE1:
     POP	    W0
     RETURN    
     
+MAPEAR_PIN_UART_RX:
+    PUSH W0
+    
+    ;Mapear UART RX al pin RP15
+    MOV #0x000F, W0
+    MOV W0, RPINR18
+    
+    POP W0
+    RETURN
+    
+UART_CONF:
+    PUSH W0
+    
+    CLR U1MODE
+    
+    ;---Configurar cantidad de BAUDIOS---
+    ;FCY = FCY = 3686250Hz = 3686250 ciclo/segundo
+    ;Baudios deseados = 9600
+    ;UxBRG = (Fcy/Baud)/16
+    ;UxBRG = ((3686250/9600)/16)-1 = 22.9990234375 = 23
+    ;Baud rate = 3686250/(16*(UxBRG + 1)) 
+    ;Baud rate = 3686250/(16*(23 + 1)) = 9,599.6093
+    
+    MOV #23, W0
+    MOV W0, U1BRG
+    
+    ;Bits de datos y paridad (8 bits de datos y sin paridad)
+    BCLR U1MODE, #PDSEL0
+    BCLR U1MODE, #PDSEL1
+    
+    ;Numero de bits de parada
+    BCLR U1MODE, #STSEL		
+    
+    ;Low speed mode baud rate
+    BCLR U1MODE, #BRGH	
+    
+    ;Habilitar UART
+    BSET U1MODE, #UARTEN	
+    
+    ;La bandera de interrupcion se activa cuando un caracter es recibido
+    BCLR U1STA, #URXISEL1
+    BCLR U1STA, #URXISEL0
+    
+    POP W0
+    
+    RETURN
+    
+INTERRUPT_UART_CONF:
+    ;Interrupciones anidadas
+    BSET INTCON1, #NSTDIS
+    
+    ;Nivel de prioridad
+    BSET IPC2, #U1RXIP2
+    BCLR IPC2, #U1RXIP1
+    BCLR IPC2, #U1RXIP0
+    
+    ;Limpiar la bandera de recepcion
+    BCLR IFS0, #U1RXIF
+    
+    ;Habilitar la bandera de recepcion
+    BSET IEC0, #U1RXIE
+    
+    RETURN
+    
+____U1RXInterrupt:
+    ;Movemos el registro de datos recibidos a W0
+    MOV U1RXREG, W8
+    
+    ;Dejamos solo los 8bits de datos
+    AND #0X00FF, W8
 
+    ;Limpiamos la bandera 
+    BCLR IFS0, #U1RXIF
+    RETFIE
+    
+    
+    
 ;..............................................................................
 ;Subroutine: Initialization of W registers to 0x0000
 ;..............................................................................
