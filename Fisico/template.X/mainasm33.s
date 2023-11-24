@@ -108,11 +108,7 @@ __reset:
     CALL _wreg_init           ;Call _wreg_init subroutine
                                   ;Optionally use RCALL instead of CALL
 
-
-
-
         ;<<insert more user code here>>
-
 
     SETM    AD1PCFGL  ;PORTB AS DIGITAL
     
