@@ -1,0 +1,12 @@
+# Ignorar todo
+*
+
+# Excepto Fisico/template.X
+!Fisico/
+Fisico/*
+!Fisico/template.X
+
+# Excepto Emulacion/Template_32MC202.X
+!Emulacion/
+Emulacion/*
+!Emulacion/Template_32MC202.X
