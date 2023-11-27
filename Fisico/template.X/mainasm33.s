@@ -130,7 +130,8 @@ __reset:
     CALL UART_CONF
     
 done:
-    MOV W8, PORTB
+    ;MOV W8, PORTB
+    CALL SWITCH
     ;MODO INACTIVO
     PWRSAV #IDLE_MODE	  
 BRA     done              ;Place holder for last line of executed code
@@ -188,6 +189,22 @@ CYCLE1:
     POP	    W9
     POP	    W0
     RETURN   
+    
+SWITCH:
+    PUSH W0
+    
+    MOV #0x0051, W0
+    CP W8, W0
+    BRA Z, ON
+    
+    POP W0
+    RETURN
+
+ON:
+    BTG PORTB, #RB0
+    CLR W8
+    RETURN
+    
     
 MAPEAR_PIN_UART_RX:
     PUSH W0
