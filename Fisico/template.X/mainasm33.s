@@ -93,7 +93,6 @@ var1:     .space 2               ;Example of allocating 1 word of space for
 
 
 
-
 ;..............................................................................
 ;Code Section in Program Memory
 ;..............................................................................
@@ -118,7 +117,9 @@ __reset:
     ;PORTB15 entrada
     BSET TRISB, #TRISB15    
     
-    MOV	    #400,   W9	    ;PARAMETER FOR DELAY_ms(w9)
+    ;MOV	    #50,   W9	    ;PARAMETER FOR DELAY_ms(w9)
+    
+    CLR var1
     
     ;Mapeo de puerto RX
     CALL MAPEAR_PIN_UART_RX
@@ -129,11 +130,14 @@ __reset:
     ;Configuracion de UART
     CALL UART_CONF
     
-done:
-    ;MOV W8, PORTB
-    CALL SWITCH
-    ;MODO INACTIVO
-    PWRSAV #IDLE_MODE	  
+    
+    
+
+done:	
+    
+    CALL SELECT
+
+    ;PWRSAV #IDLE_MODE
 BRA     done              ;Place holder for last line of executed code
     
     
@@ -155,7 +159,8 @@ BRA     done              ;Place holder for last line of executed code
 ;(BRA uses 2 CLK pulses when it jumps and just one if it does not)
 
 ;65536 * 3 cycles * 271 ns = 53.28 ms
-;Thus, "CYCLE1" must be repeated 56 times to delay 1s
+;Thus, "CYCLE1" must be repeated 19 times to delay 1s
+    
 DELAY_1s:
     PUSH	    W0
     PUSH	    W1	
@@ -188,23 +193,111 @@ CYCLE1:
     
     POP	    W9
     POP	    W0
-    RETURN   
+    RETURN  
     
-SWITCH:
-    PUSH W0
+OPC:  
+    MOV #7, W9
+    CALL PWM100
+    CALL DELAY_1ms
     
-    MOV #0x0051, W0
-    CP W8, W0
-    BRA Z, ON
+    MOV #0x002B, W13
+    CP W8, W13
+    BRA Z, SUMAR
     
-    POP W0
+    MOV #0x002D, W12
+    CP W8, W12
+    BRA Z, RESTAR
+    
+    CLR W8
     RETURN
+    
+SUMAR:
+    MOV var1, W14
+    CP W14, #4
+    BRA LTU, MAS
+    RETURN
+
+RESTAR:
+    MOV var1, W14
+    CP W14, #0
+    BRA GTU, MENOS
+    RETURN
+    
+    
+MAS:
+    INC var1
+    RETURN
+    
+MENOS:
+    DEC var1
+    RETURN
+    
+    
+SELECT:
+    MOV var1, W14
+    
+    CP W14, #4
+    BRA Z, PWM100
+    
+    CP W14, #3
+    BRA Z, PWM75
+    
+    CP W14, #2
+    BRA Z, PWM50
+    
+    CP W14, #1
+    BRA Z, PWM25
+    
+    CP W14, #0
+    BRA Z, PWM0
+    
+    RETURN
+
+PWM100:
+    BSET PORTB, #RB0
+    RETURN
+    
+PWM75:
+    
+    MOV #7, W9
+    BSET PORTB, #RB0
+    CALL DELAY_1ms
+    MOV #3, W9
+    BTG PORTB, #RB0
+    CALL DELAY_1ms
+    
+    RETURN
+    
+PWM50:
+    MOV #5, W9
+    BSET PORTB, #RB0
+    CALL DELAY_1ms
+    MOV #5, W9
+    BTG PORTB, #RB0
+    CALL DELAY_1ms
+    
+    RETURN
+    
+PWM25:
+    MOV #3, W9
+    BSET PORTB, #RB0
+    CALL DELAY_1ms
+    MOV #7, W9
+    BTG PORTB, #RB0
+    CALL DELAY_1ms
+    
+    RETURN
+    
+PWM0:
+    BCLR PORTB, #RB0
+    RETURN
+    
+
 
 ON:
     BTG PORTB, #RB0
     CLR W8
     RETURN
-    
     
 MAPEAR_PIN_UART_RX:
     PUSH W0
@@ -273,6 +366,7 @@ INTERRUPT_UART_CONF:
 __U1RXInterrupt:
     ;Mueve el dato del buffer de recepcion a W8
     MOV U1RXREG, W8
+    CALL OPC
     ;Limpiar la bandera de recepcion
     BCLR IFS0, #U1RXIF
     RETFIE

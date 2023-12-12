@@ -66,11 +66,11 @@ Default Scalar Model: Small
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x200                0x82            0xc3  (195)
-.text                        0x282                0x9c            0xea  (234)
-.dinit                       0x31e                0x14            0x1e  (30)
-.myconstbuffer               0x332                 0x8             0xc  (12)
+.text                        0x282               0x142           0x1e3  (483)
+.dinit                       0x3c4                0x1a            0x27  (39)
+.myconstbuffer               0x3de                 0x8             0xc  (12)
 
-                 Total "program" memory used (bytes):          0x1d7  (471) 1%
+                 Total "program" memory used (bytes):          0x2d9  (729) 2%
 
 
 "data" Memory  [Origin = 0x800, Length = 0x800]
@@ -78,10 +78,11 @@ section                    address   length (PC units)   length (bytes) (dec)
 section                    address      alignment gaps    total length  (dec)
 -------                    -------      --------------    -------------------
 .nbss                        0x800                   0             0x2  (2)
-.xbss                        0x802                   0            0x80  (128)
+.cbss                        0x802                   0             0x2  (2)
+.xbss                        0x804                   0            0x80  (128)
 .ybss                        0xc00                   0            0x80  (128)
 
-                 Total "data" memory used (bytes):          0x102  (258) 12%
+                 Total "data" memory used (bytes):          0x104  (260) 12%
 
 
 Dynamic Memory Usage
@@ -96,21 +97,21 @@ stack                        0xc80                               0x380  (896)
 
 External Symbols in Program Memory (by address):
 
-                  0x000206                  __data_init
                   0x000206                  __data_init_standard
+                  0x000206                  __data_init
                   0x00027c                  __DefaultInterrupt
                   0x000282                  __reset
-                  0x00030a                  ____U1RXInterrupt
-                  0x000312                  _wreg_init
+                  0x0003b2                  __U1RXInterrupt
+                  0x0003b8                  _wreg_init
 
 External Symbols in Program Memory (by name):
 
                   0x00027c                  __DefaultInterrupt
-                  0x00030a                  ____U1RXInterrupt
+                  0x0003b2                  __U1RXInterrupt
                   0x000206                  __data_init
                   0x000206                  __data_init_standard
                   0x000282                  __reset
-                  0x000312                  _wreg_init
+                  0x0003b8                  _wreg_init
 
 Memory Configuration
 
@@ -225,18 +226,18 @@ __FUID3
 .comment
  *(.comment)
 
-.debug_info       0x000000         0xac
+.debug_info       0x000000         0xaa
  *(.debug_info)
- .debug_info      0x000000         0xac build/default/production/BLINK33MC202.o
+ .debug_info      0x000000         0xaa build/default/production/BLINK33MC202.o
  *(.gnu.linkonce.wi.*)
 
 .debug_abbrev     0x000000         0x14
  *(.debug_abbrev)
  .debug_abbrev    0x000000         0x14 build/default/production/BLINK33MC202.o
 
-.debug_line       0x000000         0x8b
+.debug_line       0x000000         0xd7
  *(.debug_line)
- .debug_line      0x000000         0x8b build/default/production/BLINK33MC202.o
+ .debug_line      0x000000         0xd7 build/default/production/BLINK33MC202.o
 
 .debug_frame
  *(.debug_frame)
@@ -905,21 +906,29 @@ __c30_signature
 .nbss               0x0800          0x2
  .nbss              0x0800          0x2 build/default/production/BLINK33MC202.o
 
-.xbss               0x0802         0x80
- .xbss              0x0802         0x80 build/default/production/BLINK33MC202.o
+.cbss               0x0802          0x2
+ .cbss              0x0802          0x2 build/default/production/BLINK33MC202.o
+
+.xbss               0x0804         0x80
+ .xbss              0x0804         0x80 build/default/production/BLINK33MC202.o
 
 .ybss               0x0c00         0x80
  .ybss              0x0c00         0x80 build/default/production/BLINK33MC202.o
 
-.text             0x000282         0x9c
- .text            0x000282         0x9c build/default/production/BLINK33MC202.o
+.ivt._U1RXInterrupt
+                  0x00002a          0x2
+ .ivt._U1RXInterrupt
+                  0x00002a          0x2 build/default/production/BLINK33MC202.o
+
+.text             0x000282        0x142
+ .text            0x000282        0x142 build/default/production/BLINK33MC202.o
                   0x000282                  __reset
-                  0x00030a                  ____U1RXInterrupt
-                  0x000312                  _wreg_init
+                  0x0003b2                  __U1RXInterrupt
+                  0x0003b8                  _wreg_init
 
-.dinit            0x00031e         0x14
- .dinit           0x00031e         0x14 data_init
+.dinit            0x0003c4         0x1a
+ .dinit           0x0003c4         0x1a data_init
 
-.myconstbuffer    0x000332          0x8
+.myconstbuffer    0x0003de          0x8
  .myconstbuffer
-                  0x000332          0x8 build/default/production/BLINK33MC202.o
+                  0x0003de          0x8 build/default/production/BLINK33MC202.o

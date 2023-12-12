@@ -49,7 +49,7 @@
 
     .global __reset          ;The label for the first line of code.
     
-    .global ____U1RXInterrupt	;Interrupcion de recepcion de UART
+    .global __U1RXInterrupt	;Interrupcion de recepcion de UART
 
 ;..............................................................................
 ;Constants stored in Program space
@@ -89,7 +89,9 @@ y_input:  .space 2*SAMPLES
 
     .section .nbss, bss, near
 var1:     .space 2               ;Example of allocating 1 word of space for
-                                 ;variable "var1".
+                                 ;variable "var1
+    .section .cbss, bss, near
+cont: .space 1
 
 
 
@@ -117,7 +119,8 @@ __reset:
     SETM    AD1PCFGL  ;PORTB AS DIGITAL
     MOV #0x8000, W0
     MOV W0, TRISB
-    MOV	    #1,   W9	    ;PARAMETER FOR DELAY_ms(w9)
+    ;MOV	    #1,   W9	    ;PARAMETER FOR DELAY_ms(w9)
+    CLR cont
     
     CALL MAPEAR_PIN_UART_RX
     ;Configuracion de la interrupcion de UART
@@ -126,9 +129,8 @@ __reset:
     CALL UART_CONF
 
 done:
-    MOV W8, PORTB
-    CALL DELAY_1s
-    
+    CALL OPC
+    ;PWRSAV #IDLE_MODE
 BRA     done              ;Place holder for last line of executed code
     
     
@@ -183,7 +185,123 @@ CYCLE1:
     
     POP	    W9
     POP	    W0
-    RETURN    
+    RETURN 
+    
+OPC:
+    PUSH W0
+    
+    MOV #0x002B, W0
+    CP W8, W0
+    BRA Z, MAS
+    
+    MOV #0x002D, W0
+    CP W8, W0
+    BRA Z, MENOS
+    
+    CALL SELECT
+    
+    POP W0
+    RETURN
+    
+MAS:
+    PUSH W0
+    MOV cont, W0 
+    CP W0, #4
+    BRA LT, SUMA
+    POP W0
+    RETURN
+SUMA:
+    INC cont
+    RETURN
+    
+MENOS:
+    PUSH W0
+    MOV cont, W0
+    CP W0, #0
+    BRA GT, RES
+    POP W0
+    RETURN
+RES:
+    DEC cont
+    RETURN
+    
+    
+SELECT:
+    PUSH W0
+    PUSH W1
+    MOV cont, W1
+    
+    MOV #4, W0
+    CP W1, W0
+    BRA Z, PWM100
+    
+    MOV #3, W0
+    CP W1, W0
+    BRA Z, PWM75
+    
+    MOV #2, W0
+    CP W1, W0
+    BRA Z, PWM50
+    
+    MOV #1, W0
+    CP W1, W0
+    BRA Z, PWM25
+    
+    MOV #0, W0
+    CP W1, W0
+    BRA Z, PWM0
+    
+    POP W1
+    POP W0
+    RETURN
+
+PWM100:
+    BSET PORTB, #RB0
+    RETURN
+    
+PWM75:
+    PUSH W9
+    
+    MOV #7, W9
+    BSET PORTB, #RB0
+    CALL DELAY_1ms
+    MOV #3, W9
+    BCLR PORTB, #RB0
+    CALL DELAY_1ms
+    
+    POP W9
+    RETURN
+    
+PWM50:
+    PUSH W9
+    
+    MOV #5, W9
+    BSET PORTB, #RB0
+    CALL DELAY_1ms
+    MOV #5, W9
+    BCLR PORTB, #RB0
+    CALL DELAY_1ms
+    
+    POP W9
+    RETURN
+    
+PWM25:
+    PUSH W9
+    
+    MOV #3, W9
+    BSET PORTB, #RB0
+    CALL DELAY_1ms
+    MOV #7, W9
+    BCLR PORTB, #RB0
+    CALL DELAY_1ms
+    
+    POP W9
+    RETURN
+    
+PWM0:
+    BCLR PORTB, #RB0
+    RETURN
+
     
 MAPEAR_PIN_UART_RX:
     PUSH W0
@@ -249,13 +367,10 @@ INTERRUPT_UART_CONF:
     
     RETURN
     
-____U1RXInterrupt:
+__U1RXInterrupt:
     ;Movemos el registro de datos recibidos a W0
     MOV U1RXREG, W8
     
-    ;Dejamos solo los 8bits de datos
-    AND #0X00FF, W8
-
     ;Limpiamos la bandera 
     BCLR IFS0, #U1RXIF
     RETFIE
